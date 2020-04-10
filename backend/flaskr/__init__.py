@@ -99,10 +99,8 @@ def create_app(test_config=None):
   '''
     @app.route('/questions/<int:question_id>', methods=['DELETE'])
     def delete_question(question_id):
-        print(question_id)
         try:
             question = Question.query.filter(Question.id == question_id).one_or_none()
-            print(question)
             if question is None:
                 abort(404)
             question.delete()
@@ -111,6 +109,7 @@ def create_app(test_config=None):
 
             return jsonify({
                 'success': True,
+                'deleted': question_id,
                 'questions': current_questions,
                 'total_questions': len(Question.query.all()),
             })
