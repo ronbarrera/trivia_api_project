@@ -29,7 +29,7 @@ def create_app(test_config=None):
     '''
   @DONE: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
-    cors = CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)
+    cors = CORS(app, resources={r"/*": {"origins": "*"}})
     # CORS(app)
 
     '''
@@ -199,7 +199,7 @@ def create_app(test_config=None):
                 'success': True,
                 'questions': current_questions,
                 'total_questions': len(current_questions),
-                'current_category': None,
+                'current_category': category_id,
                 'categories': formatted_categories
             })
         except:
@@ -238,9 +238,32 @@ def create_app(test_config=None):
         })
 
     '''
-  @TODO:
+  @DONE:
   Create error handlers for all expected errors
   including 404 and 422.
   '''
+    @app.errorhandler(404)
+    def not_found(error):
+        return jsonify({
+          "success": False,
+          "error": 404,
+          "message": "resource not found"
+          }), 404
+
+    @app.errorhandler(422)
+    def unprocessable(error):
+        return jsonify({
+          "success": False,
+          "error": 422,
+          "message": "unprocessable"
+          }), 422
+
+    @app.errorhandler(400)
+    def bad_request(error):
+        return jsonify({
+          "success": False,
+          "error": 400,
+          "message": "bad request"
+          }), 400
 
     return app
