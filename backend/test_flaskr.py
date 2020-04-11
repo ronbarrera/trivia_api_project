@@ -15,14 +15,15 @@ class TriviaTestCase(unittest.TestCase):
         self.app = create_app()
         self.client = self.app.test_client
         self.database_name = "trivia_test"
-        self.database_path = "postgres://{}/{}".format('localhost:5432', self.database_name)
+        self.database_path = "postgres://{}/{}".format(
+            'localhost:5432', self.database_name)
         setup_db(self.app, self.database_path)
 
         self.new_question = {
-            'question' : 'What is Earth\'s largest continent?',
+            'question': 'What is Earth\'s largest continent?',
             'answer': 'Asia',
             'difficulty': '1',
-            'category' : '2'
+            'category': '2'
         }
 
         self.new_quiz = {
@@ -93,7 +94,10 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['message'], 'unprocessable')
 
     def test_get_question_search_with_results(self):
-        res = self.client().post('/questions/search', json={'searchTerm': 'Expressionism'})
+        res = self.client().post(
+            '/questions/search',
+            json={
+                'searchTerm': 'Expressionism'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -102,7 +106,10 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['questions']), 1)
 
     def test_get_question_search_without_results(self):
-        res = self.client().post('/questions/search', json={'searchTerm': 'abcdefghi'})
+        res = self.client().post(
+            '/questions/search',
+            json={
+                'searchTerm': 'abcdefghi'})
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -111,14 +118,18 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(len(data['questions']), 0)
 
     def test_delete_question(self):
-        res = self.client().delete('/questions/31')
+        res = self.client().post('/questions', json=self.new_question)
+        created_data = json.loads(res.data)
+        created_id = created_data['created']
+
+        res = self.client().delete('/questions/' + str(created_id))
         data = json.loads(res.data)
 
-        question = Question.query.filter(Question.id == 31).one_or_none()
+        question = Question.query.filter(Question.id == created_id).one_or_none()
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        self.assertEqual(data['deleted'], 31)
+        self.assertEqual(data['deleted'], created_id)
         self.assertTrue(data['total_questions'])
         self.assertEqual(question, None)
 
@@ -147,6 +158,7 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['question'])
+
 
 # Make the tests conveniently executable
 if __name__ == "__main__":
